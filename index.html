@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Split Bill Calculator</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🍽️ Split Bill Calculator</h1>
+            <p>Hitung pembagian tagihan dengan mudah dan akurat</p>
+        </header>
+
+        <main>
+            <!-- Input Section -->
+            <section class="input-section">
+                <h2>Detail Tagihan</h2>
+                
+                <div class="form-group">
+                    <label for="totalAmount">Total Tagihan (Rp)</label>
+                    <input type="number" id="totalAmount" placeholder="Masukkan total tagihan" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="taxPercentage">PPN (%)</label>
+                    <input type="number" id="taxPercentage" placeholder="11" value="11" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="serviceCharge">Service Charge (%)</label>
+                    <input type="number" id="serviceCharge" placeholder="10" value="10" min="0" max="100">
+                </div>
+
+                <div class="form-group">
+                    <label for="discount">Diskon (Rp)</label>
+                    <input type="number" id="discount" placeholder="0" value="0" min="0">
+                </div>
+
+                <div class="form-group">
+                    <label for="numPeople">Jumlah Orang</label>
+                    <input type="number" id="numPeople" placeholder="Masukkan jumlah orang" min="1" value="2">
+                </div>
+
+                <div class="form-group">
+                    <label for="tipPercentage">Tips (%)</label>
+                    <input type="number" id="tipPercentage" placeholder="5" value="5" min="0" max="100">
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section">
+                <h2>Hasil Perhitungan</h2>
+                
+                <div class="summary-cards">
+                    <div class="card">
+                        <h3>Subtotal</h3>
+                        <p class="amount" id="subtotal">Rp 0</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>PPN</h3>
+                        <p class="amount" id="taxAmount">Rp 0</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Service Charge</h3>
+                        <p class="amount" id="serviceAmount">Rp 0</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Tips</h3>
+                        <p class="amount" id="tipAmount">Rp 0</p>
+                    </div>
+                    
+                    <div class="card">
+                        <h3>Diskon</h3>
+                        <p class="amount discount" id="discountAmount">-Rp 0</p>
+                    </div>
+                </div>
+
+                <div class="total-card">
+                    <h3>Total Tagihan</h3>
+                    <p class="total-amount" id="grandTotal">Rp 0</p>
+                </div>
+
+                <div class="split-result">
+                    <h3>Per Orang</h3>
+                    <p class="per-person" id="perPerson">Rp 0</p>
+                </div>
+            </section>
+
+            <!-- Additional Features -->
+            <section class="features-section">
+                <h2>Fitur Tambahan</h2>
+                
+                <div class="feature-group">
+                    <h3>Split Tidak Merata</h3>
+                    <p>Jika ada yang makan lebih banyak atau lebih sedikit</p>
+                    
+                    <div class="uneven-split" id="unevenSplitContainer" style="display: none;">
+                        <div class="person-inputs" id="personInputs">
+                            <!-- Dynamic person inputs will be added here -->
+                        </div>
+                        <button type="button" id="addPersonBtn" class="btn-secondary">+ Tambah Orang</button>
+                    </div>
+                    
+                    <button type="button" id="toggleUnevenSplit" class="btn-secondary">Aktifkan Split Tidak Merata</button>
+                </div>
+
+                <div class="feature-group">
+                    <h3>Simpan Riwayat</h3>
+                    <button type="button" id="saveHistory" class="btn-secondary">Simpan Perhitungan Ini</button>
+                    <button type="button" id="clearHistory" class="btn-secondary">Hapus Riwayat</button>
+                </div>
+            </section>
+
+            <!-- History Section -->
+            <section class="history-section" id="historySection" style="display: none;">
+                <h2>Riwayat Perhitungan</h2>
+                <div id="historyList">
+                    <!-- History items will be added here -->
+                </div>
+            </section>
+        </main>
+
+        <footer>
+            <p>&copy; 2024 Split Bill Calculator. Dibuat dengan ❤️ untuk memudahkan pembagian tagihan.</p>
+        </footer>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html> 
