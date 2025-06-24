@@ -126,4 +126,4 @@ Aplikasi ini dibuat untuk tujuan edukasi dan penggunaan pribadi.
 
 ---
 
-**Dibuat dengan ❤️ untuk memudahkan pembagian tagihan** 
+**Dibuat untuk memudahkan pembagian tagihan** 
