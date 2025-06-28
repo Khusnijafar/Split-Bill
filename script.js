@@ -29,6 +29,7 @@ const historyList = document.getElementById('historyList');
 let isUnevenSplit = false;
 let personCount = 2;
 let calculationHistory = [];
+let currentGrandTotal = 0;
 
 // Initialize app
 document.addEventListener('DOMContentLoaded', function() {
@@ -75,6 +76,9 @@ function calculate() {
     // Calculate per person
     let perPerson = grandTotal / numPeople;
 
+    // Update the current grand total BEFORE display update
+    currentGrandTotal = grandTotal;
+
     // Update display
     updateDisplay(subtotal, taxAmount, serviceAmount, tipAmount, discount, grandTotal, perPerson);
     
@@ -97,6 +101,11 @@ function updateDisplay(subtotal, taxAmount, serviceAmount, tipAmount, discount, 
 
 // Format currency to Indonesian Rupiah
 function formatCurrency(amount) {
+    // Handle NaN and invalid values
+    if (isNaN(amount) || amount === null || amount === undefined) {
+        return 'Rp 0';
+    }
+    
     return new Intl.NumberFormat('id-ID', {
         style: 'currency',
         currency: 'IDR',
@@ -113,7 +122,15 @@ function toggleUnevenSplit() {
         unevenSplitContainer.style.display = 'block';
         toggleUnevenSplitBtn.textContent = 'Nonaktifkan Split Tidak Merata';
         toggleUnevenSplitBtn.style.background = 'linear-gradient(135deg, #e53e3e 0%, #c53030 100%)';
+        
+        // Ensure we have a valid calculation
+        if (currentGrandTotal === 0) {
+            calculate();
+        }
+        
         initializeUnevenSplit();
+        // Update the uneven split calculation with the current grand total
+        updateUnevenSplitCalculation(currentGrandTotal);
     } else {
         unevenSplitContainer.style.display = 'none';
         toggleUnevenSplitBtn.textContent = 'Aktifkan Split Tidak Merata';
@@ -164,19 +181,35 @@ function addPersonInput() {
     personDiv.appendChild(amountInput);
     personInputsContainer.appendChild(personDiv);
     
-    // Add event listeners
-    nameInput.addEventListener('input', updateUnevenSplitCalculation);
-    amountInput.addEventListener('input', updateUnevenSplitCalculation);
+    // Add event listeners for real-time updates
+    nameInput.addEventListener('input', () => updateUnevenSplitCalculation());
+    amountInput.addEventListener('input', () => updateUnevenSplitCalculation());
     
     updateUnevenSplitCalculation();
 }
 
-// Update uneven split calculation
-function updateUnevenSplitCalculation(grandTotal = null) {
+// Update uneven split calculation - FIXED VERSION
+function updateUnevenSplitCalculation(providedGrandTotal = null) {
     if (!isUnevenSplit) return;
     
-    if (grandTotal === null) {
-        grandTotal = parseFloat(grandTotalElement.textContent.replace(/[^\d]/g, '')) || 0;
+    // Use the provided grand total, or use the current stored value
+    let totalToSplit = providedGrandTotal !== null ? providedGrandTotal : currentGrandTotal;
+    
+    // If we still don't have a valid total, calculate it fresh
+    if (!totalToSplit || totalToSplit === 0) {
+        const totalAmount = parseFloat(totalAmountInput.value) || 0;
+        const taxPercentage = parseFloat(taxPercentageInput.value) || 0;
+        const serviceChargePercentage = parseFloat(serviceChargeInput.value) || 0;
+        const discount = parseFloat(discountInput.value) || 0;
+        const tipPercentage = parseFloat(tipPercentageInput.value) || 0;
+        
+        const subtotal = totalAmount;
+        const taxAmount = (subtotal * taxPercentage) / 100;
+        const serviceAmount = (subtotal * serviceChargePercentage) / 100;
+        const tipAmount = (subtotal * tipPercentage) / 100;
+        
+        totalToSplit = subtotal + taxAmount + serviceAmount + tipAmount - discount;
+        currentGrandTotal = totalToSplit; // Update the stored value
     }
     
     const personInputs = personInputsContainer.querySelectorAll('.person-input');
@@ -198,18 +231,18 @@ function updateUnevenSplitCalculation(grandTotal = null) {
     if (totalPersonAmount > 0) {
         results.forEach(result => {
             const proportion = result.amount / totalPersonAmount;
-            result.share = grandTotal * proportion;
+            result.share = totalToSplit * proportion;
         });
     } else {
         // Equal split if no amounts specified
-        const equalShare = grandTotal / results.length;
+        const equalShare = totalToSplit / results.length;
         results.forEach(result => {
             result.share = equalShare;
         });
     }
     
     // Update display
-    updateUnevenSplitDisplay(results, grandTotal, totalPersonAmount);
+    updateUnevenSplitDisplay(results, totalToSplit, totalPersonAmount);
 }
 
 // Update uneven split display
@@ -233,6 +266,7 @@ function updateUnevenSplitDisplay(results, grandTotal, totalPersonAmount) {
     
     results.forEach((result, index) => {
         const percentage = totalPersonAmount > 0 ? ((result.amount / totalPersonAmount) * 100).toFixed(1) : (100 / results.length).toFixed(1);
+        
         resultsHTML += `
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; padding: 10px; background: white; border-radius: 8px;">
                 <div>
@@ -267,8 +301,8 @@ function saveCurrentCalculation() {
         discount: parseFloat(discountInput.value) || 0,
         numPeople: parseInt(numPeopleInput.value) || 1,
         tipPercentage: parseFloat(tipPercentageInput.value) || 0,
-        grandTotal: parseFloat(grandTotalElement.textContent.replace(/[^\d]/g, '')) || 0,
-        perPerson: parseFloat(perPersonElement.textContent.replace(/[^\d]/g, '')) || 0
+        grandTotal: currentGrandTotal,
+        perPerson: currentGrandTotal / (parseInt(numPeopleInput.value) || 1)
     };
     
     calculationHistory.unshift(calculation);
@@ -422,4 +456,4 @@ function addSampleData() {
 }
 
 // Auto-add sample data after a delay
-setTimeout(addSampleData, 1000); 
+setTimeout(addSampleData, 1000);
